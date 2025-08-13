@@ -27,6 +27,10 @@ final class SyncReadmeExamples implements Action
         $io->write('Syncing README.md with example files...', true, IO::VERBOSE);
 
         $readme = file_get_contents($readmePath);
+        if ($readme === false) {
+            $io->write('<error>Failed to read README.md</error>');
+            return;
+        }
         $updatedReadme = $this->syncReadmeWithExamples($readme, $repository->getRoot(), $io);
 
         if ($readme !== $updatedReadme) {
@@ -139,6 +143,10 @@ final class SyncReadmeExamples implements Action
         }
 
         $code = file_get_contents($fullPath);
+        if ($code === false) {
+            $io->write(sprintf('<warning>Failed to read source file: %s</warning>', $sourceFile), true, IO::VERBOSE);
+            return null;
+        }
 
         // Replace ../vendor/autoload.php with vendor/autoload.php for README display
         $code = str_replace(
@@ -188,6 +196,10 @@ final class SyncReadmeExamples implements Action
         try {
             // Copy the file content and ensure it has proper autoload path
             $code = file_get_contents($fullPath);
+            if ($code === false) {
+                $io->write(sprintf('<warning>Failed to read source file: %s</warning>', $sourceFile), true, IO::VERBOSE);
+                return null;
+            }
 
             // Make sure the code uses absolute path for autoload
             $code = preg_replace(
@@ -196,13 +208,18 @@ final class SyncReadmeExamples implements Action
                 $code,
             );
 
+            if ($tempFile === false) {
+                $io->write(sprintf('<warning>Failed to create temp file for: %s</warning>', $sourceFile), true, IO::VERBOSE);
+                return null;
+            }
+
             file_put_contents($tempFile, $code);
 
             // Execute and capture output
             $command = sprintf('php %s 2>&1', escapeshellarg($tempFile));
             $output = shell_exec($command);
 
-            if ($output === null) {
+            if ($output === null || $output === false) {
                 $io->write(sprintf('<warning>Failed to execute: %s</warning>', $sourceFile), true, IO::VERBOSE);
 
                 return null;
@@ -211,7 +228,7 @@ final class SyncReadmeExamples implements Action
             // Clean up the output
             return $this->normalizeOutput($output);
         } finally {
-            if (file_exists($tempFile)) {
+            if ($tempFile !== false && file_exists($tempFile)) {
                 unlink($tempFile);
             }
         }
