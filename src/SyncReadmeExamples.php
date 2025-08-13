@@ -63,16 +63,16 @@ final class SyncReadmeExamples implements Action
             if (preg_match('/^<!-- source: (.+) -->$/', trim($line), $matches)) {
                 $sourceFile = $matches[1];
                 $result[] = $line; // Keep the source comment
-                $i++;
+                ++$i;
 
                 // Process the code block
                 if ($i < count($lines) && preg_match('/^```php\s*$/', $lines[$i])) {
                     $result[] = $lines[$i]; // Keep ```php
-                    $i++;
+                    ++$i;
 
                     // Skip old code content until closing ```
                     while ($i < count($lines) && $lines[$i] !== '```') {
-                        $i++;
+                        ++$i;
                     }
 
                     // Insert new code from source file
@@ -88,7 +88,7 @@ final class SyncReadmeExamples implements Action
 
                     if ($i < count($lines) && $lines[$i] === '```') {
                         $result[] = $lines[$i]; // Keep closing ```
-                        $i++;
+                        ++$i;
                     }
                 }
             }
@@ -96,16 +96,16 @@ final class SyncReadmeExamples implements Action
             elseif (preg_match('/^<!-- output: (.+) -->$/', trim($line), $matches)) {
                 $sourceFile = $matches[1];
                 $result[] = $line; // Keep the output comment
-                $i++;
+                ++$i;
 
                 // Process the output code block
                 if ($i < count($lines) && preg_match('/^```php\s*$/', $lines[$i])) {
                     $result[] = $lines[$i]; // Keep ```php
-                    $i++;
+                    ++$i;
 
                     // Skip old output until closing ```
                     while ($i < count($lines) && $lines[$i] !== '```') {
-                        $i++;
+                        ++$i;
                     }
 
                     // Insert new output from executing the file
@@ -120,12 +120,12 @@ final class SyncReadmeExamples implements Action
 
                     if ($i < count($lines) && $lines[$i] === '```') {
                         $result[] = $lines[$i]; // Keep closing ```
-                        $i++;
+                        ++$i;
                     }
                 }
             } else {
                 $result[] = $line;
-                $i++;
+                ++$i;
             }
         }
 
