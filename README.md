@@ -40,44 +40,27 @@ The hook automatically stages the updated README.md if changes are detected, ens
 
 To sync a code example with a source file, add a comment before your code block:
 
-```markdown
+````markdown
 <!-- source: examples/demo.php -->
 ```php
 // This code will be replaced with content from examples/demo.php
 ```
-```
+````
 
 ### Syncing Output (Optional)
 
 To show the output of executing a PHP file, use:
 
-```markdown
+````markdown
 <!-- output: examples/demo.php -->
 ```php
 // This will be replaced with the output from executing examples/demo.php
 ```
-```
+````
 
 ## Example
 
-Here's how it looks in practice (from the [ruudk/code-generator](https://github.com/ruudk/code-generator) project):
-
-**In your README.md:**
-```markdown
-## Example
-
-<!-- source: examples/class.php -->
-```php
-// Code will be synced here
-```
-
-### Output
-
-<!-- output: examples/class.php -->
-```php
-// Output will be synced here
-```
-```
+Here's how it looks in practice: [ruudk/code-generator](https://github.com/ruudk/code-generator).
 
 **Result after sync:**
 The hook automatically replaces the code blocks with:
