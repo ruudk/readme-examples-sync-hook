@@ -1,0 +1,7 @@
+/.github export-ignore
+.* export-ignore
+/captainhook.json export-ignore
+/composer.json
+/composer.lock export-ignore
+/phpstan.neon export-ignore
+/phpstan.php export-ignore
