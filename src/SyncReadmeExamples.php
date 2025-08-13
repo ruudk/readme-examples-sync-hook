@@ -27,10 +27,13 @@ final class SyncReadmeExamples implements Action
         $io->write('Syncing README.md with example files...', true, IO::VERBOSE);
 
         $readme = file_get_contents($readmePath);
+
         if ($readme === false) {
             $io->write('<error>Failed to read README.md</error>');
+
             return;
         }
+
         $updatedReadme = $this->syncReadmeWithExamples($readme, $repository->getRoot(), $io);
 
         if ($readme !== $updatedReadme) {
@@ -143,8 +146,10 @@ final class SyncReadmeExamples implements Action
         }
 
         $code = file_get_contents($fullPath);
+
         if ($code === false) {
             $io->write(sprintf('<warning>Failed to read source file: %s</warning>', $sourceFile), true, IO::VERBOSE);
+
             return null;
         }
 
@@ -196,8 +201,10 @@ final class SyncReadmeExamples implements Action
         try {
             // Copy the file content and ensure it has proper autoload path
             $code = file_get_contents($fullPath);
+
             if ($code === false) {
                 $io->write(sprintf('<warning>Failed to read source file: %s</warning>', $sourceFile), true, IO::VERBOSE);
+
                 return null;
             }
 
@@ -210,6 +217,7 @@ final class SyncReadmeExamples implements Action
 
             if ($tempFile === false) {
                 $io->write(sprintf('<warning>Failed to create temp file for: %s</warning>', $sourceFile), true, IO::VERBOSE);
+
                 return null;
             }
 
