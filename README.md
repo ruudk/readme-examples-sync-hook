@@ -62,19 +62,6 @@ To show the output of executing a PHP file, use:
 
 Here's how it looks in practice: [ruudk/code-generator](https://github.com/ruudk/code-generator).
 
-**Result after sync:**
-The hook automatically replaces the code blocks with:
-- The actual source code from `examples/class.php`
-- The output generated when executing `examples/class.php`
-
-## Features
-
-- **Automatic path adjustments**: Converts relative autoload paths for README display
-- **Clean output formatting**: Removes unnecessary whitespace and formatting issues
-- **Git integration**: Automatically stages README changes when updates are detected
-- **Verbose logging**: Provides detailed feedback during the sync process
-- **Safe execution**: Uses temporary files for executing examples
-
 ## License
 
 MIT
