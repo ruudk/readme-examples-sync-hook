@@ -64,6 +64,19 @@ To show the output of executing a PHP file, use:
 
 Here's how it looks in practice: [ruudk/code-generator](https://github.com/ruudk/code-generator).
 
-## License
+## 💖 Support This Project
 
-MIT
+Love this tool? Help me keep building awesome open source software!
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink)](https://github.com/sponsors/ruudk)
+
+Your sponsorship helps me dedicate more time to maintaining and improving this project. Every contribution, no matter the size, makes a difference!
+
+## 🤝 Contributing
+
+I welcome contributions! Whether it's a bug fix, new feature, or documentation improvement, I'd love to see your PRs.
+
+## 📄 License
+
+MIT License – Free to use in your projects! If you're using this and finding value, please consider [sponsoring](https://github.com/sponsors/ruudk) to support continued development.
+
