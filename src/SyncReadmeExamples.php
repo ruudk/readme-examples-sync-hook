@@ -62,12 +62,13 @@ final class SyncReadmeExamples implements Action
             // Check for source comment
             if (preg_match('/^<!-- source: (.+) -->$/', trim($line), $matches)) {
                 $sourceFile = $matches[1];
+                $language = $this->getLanguageFromExtension($sourceFile);
                 $result[] = $line; // Keep the source comment
                 ++$i;
 
                 // Process the code block
-                if ($i < count($lines) && preg_match('/^```php\s*$/', $lines[$i])) {
-                    $result[] = $lines[$i]; // Keep ```php
+                if ($i < count($lines) && preg_match('/^```\w*\s*$/', $lines[$i])) {
+                    $result[] = '```' . $language; // Use inferred language
                     ++$i;
 
                     // Skip old code content until closing ```
@@ -261,5 +262,40 @@ final class SyncReadmeExamples implements Action
         }
 
         return implode("\n", $lines);
+    }
+
+    /**
+     * Infer the language identifier from file extension
+     */
+    private function getLanguageFromExtension(string $filePath) : string
+    {
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+
+        return match ($extension) {
+            'php' => 'php',
+            'graphql', 'gql' => 'graphql',
+            'js', 'mjs', 'cjs' => 'javascript',
+            'ts', 'mts', 'cts' => 'typescript',
+            'json' => 'json',
+            'yml', 'yaml' => 'yaml',
+            'xml' => 'xml',
+            'sql' => 'sql',
+            'sh', 'bash' => 'bash',
+            'py' => 'python',
+            'rb' => 'ruby',
+            'go' => 'go',
+            'rs' => 'rust',
+            'java' => 'java',
+            'c' => 'c',
+            'cpp', 'cc', 'cxx' => 'cpp',
+            'cs' => 'csharp',
+            'swift' => 'swift',
+            'kt', 'kts' => 'kotlin',
+            'md', 'markdown' => 'markdown',
+            'html', 'htm' => 'html',
+            'css' => 'css',
+            'scss', 'sass' => 'scss',
+            default => '',
+        };
     }
 }
