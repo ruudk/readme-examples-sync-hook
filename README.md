@@ -38,7 +38,7 @@ The hook automatically stages the updated README.md if changes are detected, ens
 
 ### Syncing Source Code
 
-To sync a code example with a source file, add a comment before your code block:
+To sync a code example with a source file, add a comment before your code block. The language identifier (e.g., `php`, `graphql`, `javascript`) is automatically inferred from the file extension:
 
 ````markdown
 <!-- source: examples/demo.php -->
@@ -46,6 +46,8 @@ To sync a code example with a source file, add a comment before your code block:
 // This code will be replaced with content from examples/demo.php
 ```
 ````
+
+The hook supports a wide range of file extensions including `.php`, `.graphql`, `.gql`, `.js`, `.ts`, `.json`, `.yml`, `.yaml`, `.sql`, and many more.
 
 ### Syncing Output (Optional)
 
