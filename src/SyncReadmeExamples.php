@@ -294,6 +294,7 @@ final class SyncReadmeExamples implements Action
             'md', 'markdown' => 'markdown',
             'html', 'htm' => 'html',
             'css' => 'css',
+            'twig' => 'twig',
             'scss', 'sass' => 'scss',
             default => '',
         };
