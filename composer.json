@@ -16,7 +16,6 @@
         "php": "^8.4"
     },
     "require-dev": {
-        "captainhook/captainhook": "^5.25",
         "ergebnis/composer-normalize": "^2.48",
         "friendsofphp/php-cs-fixer": "^3.85",
         "phpstan/extension-installer": "^1.4",
@@ -29,10 +28,18 @@
             "Ruudk\\ReadmeExamplesSyncHook\\": "src/"
         }
     },
+    "bin": [
+        "bin/readme-examples-sync"
+    ],
     "config": {
         "allow-plugins": {
             "ergebnis/composer-normalize": true,
             "phpstan/extension-installer": true
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "command -v lefthook >/dev/null 2>&1 && lefthook install || true"
+        ]
     }
 }

@@ -4,53 +4,54 @@ declare(strict_types=1);
 
 namespace Ruudk\ReadmeExamplesSyncHook;
 
-use CaptainHook\App\Config;
-use CaptainHook\App\Config\Action as ActionConfig;
-use CaptainHook\App\Console\IO;
-use CaptainHook\App\Hook\Action;
-use Override;
-use SebastianFeldmann\Git\Repository;
-
-final class SyncReadmeExamples implements Action
+final class SyncReadmeExamples
 {
-    #[Override]
-    public function execute(Config $config, IO $io, Repository $repository, ActionConfig $action) : void
+    /**
+     * Sync README.md with example files
+     *
+     * @return int Exit code (0 for success, 1 for error)
+     */
+    public function sync(string $repositoryRoot) : int
     {
-        $readmePath = $repository->getRoot() . '/README.md';
+        $readmePath = $repositoryRoot . '/README.md';
 
         if ( ! file_exists($readmePath)) {
-            $io->write('README.md not found, skipping sync', true, IO::VERBOSE);
+            $this->writeOutput('README.md not found, skipping sync');
 
-            return;
+            return 0;
         }
 
-        $io->write('Syncing README.md with example files...', true, IO::VERBOSE);
+        $this->writeOutput('Syncing README.md with example files...');
 
         $readme = file_get_contents($readmePath);
 
         if ($readme === false) {
-            $io->write('<error>Failed to read README.md</error>');
+            $this->writeError('Failed to read README.md');
 
-            return;
+            return 1;
         }
 
-        $updatedReadme = $this->syncReadmeWithExamples($readme, $repository->getRoot(), $io);
+        $updatedReadme = $this->syncReadmeWithExamples($readme, $repositoryRoot);
 
         if ($readme !== $updatedReadme) {
             file_put_contents($readmePath, $updatedReadme);
-            $io->write('<info>✓ README.md has been synced with example files</info>');
+            $this->writeOutput('✓ README.md has been synced with example files');
 
-            // Stage the README changes
-            exec('git add README.md');
+            // Stage the README changes if in a git repository
+            if (is_dir($repositoryRoot . '/.git')) {
+                exec('git add README.md');
+            }
         } else {
-            $io->write('<info>✓ README.md is already in sync</info>');
+            $this->writeOutput('✓ README.md is already in sync');
         }
+
+        return 0;
     }
 
     /**
      * Sync README content with example files
      */
-    private function syncReadmeWithExamples(string $readme, string $repositoryRoot, IO $io) : string
+    private function syncReadmeWithExamples(string $readme, string $repositoryRoot) : string
     {
         $lines = explode("\n", $readme);
         $result = [];
@@ -77,7 +78,7 @@ final class SyncReadmeExamples implements Action
                     }
 
                     // Insert new code from source file
-                    $code = $this->getExampleCode($sourceFile, $repositoryRoot, $io);
+                    $code = $this->getExampleCode($sourceFile, $repositoryRoot);
 
                     if ($code !== null) {
                         // Add code lines without trailing newline on last line
@@ -110,7 +111,7 @@ final class SyncReadmeExamples implements Action
                     }
 
                     // Insert new output from executing the file
-                    $output = $this->executeExample($sourceFile, $repositoryRoot, $io);
+                    $output = $this->executeExample($sourceFile, $repositoryRoot);
 
                     if ($output !== null) {
                         $outputLines = explode("\n", rtrim($output));
@@ -136,12 +137,12 @@ final class SyncReadmeExamples implements Action
     /**
      * Get code from example file with path adjustments
      */
-    private function getExampleCode(string $sourceFile, string $repositoryRoot, IO $io) : ?string
+    private function getExampleCode(string $sourceFile, string $repositoryRoot) : ?string
     {
         $fullPath = $repositoryRoot . '/' . $sourceFile;
 
         if ( ! file_exists($fullPath)) {
-            $io->write(sprintf('<warning>Source file not found: %s</warning>', $sourceFile), true, IO::VERBOSE);
+            $this->writeOutput(sprintf('Warning: Source file not found: %s', $sourceFile));
 
             return null;
         }
@@ -149,7 +150,7 @@ final class SyncReadmeExamples implements Action
         $code = file_get_contents($fullPath);
 
         if ($code === false) {
-            $io->write(sprintf('<warning>Failed to read source file: %s</warning>', $sourceFile), true, IO::VERBOSE);
+            $this->writeOutput(sprintf('Warning: Failed to read source file: %s', $sourceFile));
 
             return null;
         }
@@ -186,12 +187,12 @@ final class SyncReadmeExamples implements Action
     /**
      * Execute example file and capture output
      */
-    private function executeExample(string $sourceFile, string $repositoryRoot, IO $io) : ?string
+    private function executeExample(string $sourceFile, string $repositoryRoot) : ?string
     {
         $fullPath = $repositoryRoot . '/' . $sourceFile;
 
         if ( ! file_exists($fullPath)) {
-            $io->write(sprintf('<warning>Source file not found: %s</warning>', $sourceFile), true, IO::VERBOSE);
+            $this->writeOutput(sprintf('Warning: Source file not found: %s', $sourceFile));
 
             return null;
         }
@@ -204,7 +205,7 @@ final class SyncReadmeExamples implements Action
             $code = file_get_contents($fullPath);
 
             if ($code === false) {
-                $io->write(sprintf('<warning>Failed to read source file: %s</warning>', $sourceFile), true, IO::VERBOSE);
+                $this->writeOutput(sprintf('Warning: Failed to read source file: %s', $sourceFile));
 
                 return null;
             }
@@ -217,7 +218,7 @@ final class SyncReadmeExamples implements Action
             );
 
             if ($tempFile === false) {
-                $io->write(sprintf('<warning>Failed to create temp file for: %s</warning>', $sourceFile), true, IO::VERBOSE);
+                $this->writeOutput(sprintf('Warning: Failed to create temp file for: %s', $sourceFile));
 
                 return null;
             }
@@ -229,7 +230,7 @@ final class SyncReadmeExamples implements Action
             $output = shell_exec($command);
 
             if ($output === null || $output === false) {
-                $io->write(sprintf('<warning>Failed to execute: %s</warning>', $sourceFile), true, IO::VERBOSE);
+                $this->writeOutput(sprintf('Warning: Failed to execute: %s', $sourceFile));
 
                 return null;
             }
@@ -298,5 +299,21 @@ final class SyncReadmeExamples implements Action
             'scss', 'sass' => 'scss',
             default => '',
         };
+    }
+
+    /**
+     * Write output message to stdout
+     */
+    private function writeOutput(string $message) : void
+    {
+        echo $message . PHP_EOL;
+    }
+
+    /**
+     * Write error message to stderr
+     */
+    private function writeError(string $message) : void
+    {
+        fwrite(STDERR, $message . PHP_EOL);
     }
 }

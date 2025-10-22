@@ -1,0 +1,19 @@
+pre-commit:
+    parallel: true
+    commands:
+        composer-normalize:
+            glob:
+                - "composer.json"
+                - "composer.lock"
+            run: composer normalize --diff
+            stage_fixed: true
+
+        php-cs-fixer:
+            glob:
+                - "bin/readme-examples-sync"
+                - "*.php"
+            run: vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php -- {staged_files}
+            stage_fixed: true
+
+        phpstan:
+            run: vendor/bin/phpstan

@@ -1,0 +1,40 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Find and include the Composer autoloader
+$autoloadPaths = [
+    __DIR__ . '/../../../autoload.php', // When installed as a dependency
+    __DIR__ . '/../vendor/autoload.php', // When in the project root
+];
+
+$autoloaded = false;
+foreach ($autoloadPaths as $file) {
+    if (file_exists($file)) {
+        require $file;
+        $autoloaded = true;
+
+        break;
+    }
+}
+
+if ( ! $autoloaded) {
+    fwrite(STDERR, "Error: Could not find Composer autoload file.\n");
+    exit(1);
+}
+
+use Ruudk\ReadmeExamplesSyncHook\SyncReadmeExamples;
+
+// Determine the repository root (current directory by default)
+$repositoryRoot = getcwd();
+
+if ($repositoryRoot === false) {
+    fwrite(STDERR, "Error: Could not determine current directory.\n");
+    exit(1);
+}
+
+$syncer = new SyncReadmeExamples();
+$exitCode = $syncer->sync($repositoryRoot);
+
+exit($exitCode);

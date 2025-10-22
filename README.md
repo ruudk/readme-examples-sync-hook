@@ -1,6 +1,7 @@
-# README Examples Sync Hook
+# README Examples Sync
 
-A [CaptainHook](https://github.com/captainhook-git/captainhook) action that automatically syncs PHP code examples in your README.md with actual source files. This ensures your documentation always shows up-to-date, working code examples.
+A PHP script that automatically syncs code examples in your README.md with actual source files.
+This ensures your documentation always shows up-to-date, working code examples.
 
 ## Installation
 
@@ -8,33 +9,67 @@ A [CaptainHook](https://github.com/captainhook-git/captainhook) action that auto
 composer require --dev ruudk/readme-examples-sync-hook
 ```
 
-## Configuration
+## Usage
 
-Add the hook to your `captainhook.json` configuration file in the `pre-commit` section:
+Run the script from your project root:
 
-```json
-{
-    "pre-commit": {
-        "enabled": true,
-        "actions": [
-            {
-                "action": "\\Ruudk\\ReadmeExamplesSyncHook\\SyncReadmeExamples"
-            }
-        ]
-    }
-}
+```bash
+vendor/bin/readme-examples-sync
+```
+
+### Git Hook Integration
+
+The easiest way to automatically sync your README on commit is using [Lefthook](https://lefthook.dev):
+
+1. Install Lefthook (if not already installed):
+   ```bash
+   # macOS
+   brew install lefthook
+   ```
+
+2. Create a `lefthook.yml` file in your project root:
+   ```yaml
+   pre-commit:
+     parallel: false
+     commands:
+       sync-readme-examples:
+         glob:
+           - "*.php"
+           - "*.md"
+         run: vendor/bin/readme-examples-sync
+         stage_fixed: true
+   ```
+
+3. Install the hooks:
+   ```bash
+   lefthook install
+   ```
+
+That's it! Now your README will automatically sync whenever you commit changes to PHP or Markdown files.
+
+#### Alternative: Manual Git Hook
+
+If you prefer not to use Lefthook, you can manually create a `.git/hooks/pre-commit` file:
+
+```bash
+#!/bin/bash
+vendor/bin/readme-examples-sync
+```
+
+Don't forget to make the hook executable:
+
+```bash
+chmod +x .git/hooks/pre-commit
 ```
 
 ## How It Works
 
-This hook scans your README.md file for special HTML comments that mark code examples:
+This script scans your README.md file for special HTML comments that mark code examples:
 
 1. **Source code sync**: Updates code blocks marked with `<!-- source: ... -->` with the actual content from source files
-2. **Output sync** (optional): When you add `<!-- output: ... -->` comments, the hook executes PHP files and captures their output to display results
+2. **Output sync** (optional): When you add `<!-- output: ... -->` comments, the script executes PHP files and captures their output to display results
 
-The hook automatically stages the updated README.md if changes are detected, ensuring your documentation stays in sync with your code.
-
-## Usage
+The script automatically stages the updated README.md if changes are detected (when run in a git repository), ensuring your documentation stays in sync with your code.
 
 ### Syncing Source Code
 
